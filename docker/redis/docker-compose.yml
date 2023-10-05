@@ -1,0 +1,7 @@
+version: '3.9'
+services:
+  polar-redis:
+    image: "redis:7.0"
+    container_name: "polar-redis"
+    ports:
+      - 6379:6379

@@ -16,13 +16,17 @@ spec:
       containers:
         - name: polar-postgres
           image: postgres:14.4
+          lifecycle:
+            postStart:
+              exec:
+                command: ["/bin/sh", "-c", "sleep 20 && psql -w -U user -d postgres -c 'CREATE DATABASE polardb_catalog;' -c 'CREATE DATABASE polardb_order;'"]
           env:
             - name: POSTGRES_USER
               value: user
             - name: POSTGRES_PASSWORD
               value: password
-            - name: POSTGRES_DB
-              value: polardb_catalog
+            #- name: POSTGRES_DB
+            #  value: polardb_catalog
           resources:
             requests:
               cpu: 100m
