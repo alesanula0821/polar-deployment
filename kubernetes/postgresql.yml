@@ -1,3 +1,16 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-config
+  labels:
+    db: polar-postgres
+data:
+  init.sql: |
+    CREATE DATABASE polardb_catalog;
+    CREATE DATABASE polardb_order;
+
+---
+
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -16,10 +29,10 @@ spec:
       containers:
         - name: polar-postgres
           image: postgres:14.4
-          lifecycle:
-            postStart:
-              exec:
-                command: ["/bin/sh", "-c", "sleep 20 && psql -w -U user -d postgres -c 'CREATE DATABASE polardb_catalog;' -c 'CREATE DATABASE polardb_order;'"]
+          # lifecycle:
+            # postStart:
+              # exec:
+                # command: ["/bin/sh", "-c", "sleep 20 && psql -w -U user -d postgres -c 'CREATE DATABASE polardb_catalog;' -c 'CREATE DATABASE polardb_order;'"]
           env:
             - name: POSTGRES_USER
               value: user
@@ -34,6 +47,13 @@ spec:
             limits:
               cpu: 200m
               memory: 120Mi
+          volumeMounts:
+            - mountPath: /docker-entrypoint-initdb.d
+              name: postgres-config-volume
+      volumes:
+        - name: postgres-config-volume
+          configMap:
+            name: postgres-config            
 
 ---
 
